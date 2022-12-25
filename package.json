@@ -1,0 +1,29 @@
+{
+  "name": "food-donation-backend",
+  "version": "1.0.0",
+  "description": "This is a backend of food donation App (Intership project INeuron) : Node.Js , Express.Js , MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./index.js",
+    "dev": "nodemon ./index/js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MangeshThakre/food-donation-backend-FSJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MangeshThakre/food-donation-backend-FSJS/issues"
+  },
+  "homepage": "https://github.com/MangeshThakre/food-donation-backend-FSJS#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.8.1",
+    "nodemon": "^2.0.20"
+  }
+}
