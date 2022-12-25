@@ -16,6 +16,14 @@ const userSchema = mongoose.Schema(
       required: [true, "Email is required"],
       unique: true
     },
+    address: {
+      country: { type: String },
+      zip_code: { type: Number },
+      state: { type: String },
+      city: { type: String },
+      street: { type: String },
+      building: { type: String }
+    },
     password: {
       type: String,
       required: [true, "password is required"],
@@ -80,3 +88,10 @@ userSchema.methods = {
 };
 
 export default mongoose.model("User", userSchema);
+
+//  country       Country
+//  zip_code      Zip code
+//  state         State, province or prefecture
+//  city          City
+//  street        Street address
+//  building      Apt, office, suite, etc. (Optional)
