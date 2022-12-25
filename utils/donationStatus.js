@@ -4,5 +4,4 @@ const DonationStatus = {
   INPROGRESS: "INPROGRESS",
   APPLIED: "APPLIED"
 };
-
-export default DonationStatus;
+module.exports = DonationStatus;

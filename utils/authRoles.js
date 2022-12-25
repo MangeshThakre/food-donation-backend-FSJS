@@ -4,4 +4,4 @@ const AuthRoles = {
   AGENT: "AGENT"
 };
 
-export default AuthRoles;
+module.exports = AuthRoles;

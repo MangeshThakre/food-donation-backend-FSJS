@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import AuthRoles from "../utils/authRoles";
-import bcrypt from "bcryptjs";
-import JWT from "jsonwebtoken";
-import crypto from "crypto";
+const mongoose = require("mongoose");
+const AuthRoles = require("../utils/authRoles");
+const bcrypt = require("bcryptjs");
+const JWT = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const userSchema = mongoose.Schema(
   {
@@ -87,7 +87,8 @@ userSchema.methods = {
   }
 };
 
-export default mongoose.model("User", userSchema);
+const userModel = mongoose.model("user", userSchema);
+module.exports = userModel;
 
 //  country       Country
 //  zip_code      Zip code
