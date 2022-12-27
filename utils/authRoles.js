@@ -1,6 +1,6 @@
 const AuthRoles = {
   ADMIN: "ADMIN",
-  DONAOR: "DONAOR",
+  DONOR: "DONOR",
   AGENT: "AGENT"
 };
 
