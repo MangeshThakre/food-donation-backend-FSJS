@@ -3,6 +3,6 @@ const DonationStatus = {
   ACCEPETED: "ACCEPETED",
   REJECTED: "REJECTED",
   COLLECTED: "COLLECTED",
-  DELIVERD: "DELEVERD"
+  DELIVERD: "DELIVERD"
 };
 module.exports = DonationStatus;
