@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 const AuthRoles = require("../utils/authRoles");
 const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const userSchema = mongoose.Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -16,24 +17,31 @@ const userSchema = mongoose.Schema(
       required: [true, "Email is required"],
       unique: true
     },
-    address: {
-      country: { type: String },
-      zip_code: { type: Number },
-      state: { type: String },
-      city: { type: String },
-      street: { type: String },
-      building: { type: String }
-    },
+    address: new Schema(
+      {
+        country: { type: String, required: [true, "Countery is Required"] },
+        zip_code: {
+          type: Number,
+          required: [true, "Zip code/Area code is required"]
+        },
+        state: { type: String, required: [true, "State is Required"] },
+        city: { type: String, required: [true, "City is Required"] },
+        street: { type: String, required: [true, "Street is Requied"] },
+        building: { type: String, required: [true, "Building is Required"] }
+      },
+      { _id: false }
+    ),
     password: {
       type: String,
       required: [true, "password is required"],
       minLength: [8, "password must be at least 8 characters"],
+      maxLength: [8, "password must have 8 characters"],
       select: false
     },
     role: {
       type: String,
       enum: Object.values(AuthRoles),
-      default: AuthRoles.AGENT
+      default: AuthRoles.DONAOR
     },
     forgotPasswordToken: String,
     forgotPasswordExpiry: Date
@@ -47,6 +55,7 @@ const userSchema = mongoose.Schema(
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
+  console.log(this.password);
   next();
 });
 
@@ -79,10 +88,8 @@ userSchema.methods = {
       .createHash("sha256")
       .update(forgotToken)
       .digest("hex");
-
-    this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
+    this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000; // 20min
     //step 2 - return values to user
-
     return forgotToken;
   }
 };

@@ -1,7 +1,14 @@
 const errorHandler = (err, req, res, next) => {
-  const statusCode = err.code || 500;
-  const message = err.message || "INTERNET SERVER ERROR";
-  return res.status(statusCode).json({ success: true, message: message });
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "INTERNET SERVER ERROR";
+
+  // unique field-value error
+  if (err.code === 11000) {
+    message = `${Object.keys(err.keyValue)} should be unique`;
+    statusCode = 400;
+  }
+  console.log(err);
+  return res.status(statusCode).json({ success: false, message: message });
 };
 
 module.exports = errorHandler;

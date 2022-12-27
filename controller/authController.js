@@ -1,6 +1,7 @@
-const userModel = require("../model/userModel");
+const userModel = require("../model/userModel.js");
 const CustomError = require("../utils/customError.js");
 const transporter = require("../config/emailTranspoter.js");
+const cookieOptions = require("../utils/cookieOptions.js");
 
 const signUp = async (req, res, next) => {
   const data = req.body;
@@ -24,7 +25,6 @@ const signIn = async (req, res, next) => {
     }
 
     const isPasswordMatched = await user.comparePassword(password);
-
     if (isPasswordMatched) {
       const token = user.getJwtToken();
       user.password = undefined;
