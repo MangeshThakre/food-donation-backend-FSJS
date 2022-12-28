@@ -2,9 +2,12 @@ const userModel = require("../model/userModel.js");
 const CustomError = require("../utils/customError.js");
 const transporter = require("../config/emailTranspoter.js");
 const cookieOptions = require("../utils/cookieOptions.js");
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 const signUp = async (req, res, next) => {
   const data = req.body;
+  return res.json({ data });
   try {
     const userInfo = new userModel(data);
     const result = await userInfo.save();
@@ -28,11 +31,10 @@ const signIn = async (req, res, next) => {
     if (isPasswordMatched) {
       const token = user.getJwtToken();
       user.password = undefined;
-      res.cookie("token", token, cookieOptions);
+      res.cookie("Token", token, cookieOptions);
       return res.status(200).json({
         success: true,
-        token,
-        user
+        token
       });
     } else {
       return next(
@@ -68,9 +70,7 @@ const forgotPassword = async (req, res, next) => {
     const resetToken = user.generateForgotPasswordToken();
     await user.save();
 
-    const resetUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/api/auth/password/reset/${resetToken}`;
+    const resetUrl = `${req.headers.referer}reset_password/${resetToken}`;
 
     // create mail content
     const mailOptions = {
@@ -98,8 +98,14 @@ const forgotPassword = async (req, res, next) => {
   }
 };
 const resetPassword = async (req, res, next) => {
-  const { forgotPasswordToken } = req.params;
+  const { token } = req.params;
   const { password, confirmPassword } = req.body;
+
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
   try {
     if (!password || !confirmPassword) {
       return next(
@@ -115,7 +121,7 @@ const resetPassword = async (req, res, next) => {
 
     // check user is exist
     const user = await userModel.findOne({
-      forgotPasswordToken,
+      forgotPasswordToken: resetPasswordToken,
       forgotPasswordExpiry: { $gt: new Date(Date.now()) }
     });
     if (!user) {
@@ -124,14 +130,13 @@ const resetPassword = async (req, res, next) => {
       );
     }
 
-    // create hash password and and store in database
-    const hashPass = await bcrypt.hash(password, 10);
-    user.password = hashPass;
+    user.password = password;
     user.forgotPasswordToken = undefined;
     user.forgotPasswordExpiry = undefined;
     await user.save();
+
     // create jwt token and send  to client,
-    const token = user.generateJwtToken();
+    const token = user.getJwtToken();
     res.status(200).cookie("Token", token, cookieOptions).json({
       success: true,
       message: "successfuly updated the password",

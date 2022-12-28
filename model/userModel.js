@@ -34,8 +34,6 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, "password is required"],
-      minLength: [8, "password must be at least 8 characters"],
-      maxLength: [8, "password must have 8 characters"],
       select: false
     },
     role: {
@@ -43,7 +41,7 @@ const userSchema = new Schema(
       enum: Object.values(AuthRoles),
       default: AuthRoles.DONAOR
     },
-    forgotPasswordToken: String,
+    forgotPasswordExpiry: String,
     forgotPasswordExpiry: Date
   },
   {
