@@ -10,9 +10,14 @@ const donationSchema = new Schema(
       new Schema(
         {
           item: { type: String, required: [true, "Food item is Required"] },
-          quentity: {
+          quantity: {
             type: String,
             required: [true, "Food Quentity Is Required"]
+          },
+          unit: {
+            type: String,
+            required: [true, "Status of Unit is Required"],
+            enum: ["Kilogram", "Liter"]
           }
         },
         { _id: false }
@@ -21,14 +26,14 @@ const donationSchema = new Schema(
     pickUpAddress: new mongoose.Schema(
       {
         country: { type: String, required: [true, "Countery is Required"] },
-        zip_code: {
+        pinCode: {
           type: Number,
           required: [true, "Zip code/Area code is required"]
         },
         state: { type: String, required: [true, "State is Required"] },
         city: { type: String, required: [true, "City is Required"] },
         street: { type: String, required: [true, "Street is Requied"] },
-        building: { type: String, required: [true, "Building is Required"] }
+        building: { type: String }
       },
       { _id: false }
     ),

@@ -7,9 +7,14 @@ const crypto = require("crypto");
 
 const userSchema = new Schema(
   {
-    name: {
+    firstName: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true, "First Name is required"],
+      maxLength: [50, "Name must be less than 50"]
+    },
+    lastName: {
+      type: String,
+      required: [true, "Last Name is required"],
       maxLength: [50, "Name must be less than 50"]
     },
     email: {
@@ -20,14 +25,14 @@ const userSchema = new Schema(
     address: new Schema(
       {
         country: { type: String, required: [true, "Countery is Required"] },
-        zip_code: {
+        pinCode: {
           type: Number,
           required: [true, "Zip code/Area code is required"]
         },
         state: { type: String, required: [true, "State is Required"] },
         city: { type: String, required: [true, "City is Required"] },
         street: { type: String, required: [true, "Street is Requied"] },
-        building: { type: String, required: [true, "Building is Required"] }
+        building: { type: String }
       },
       { _id: false }
     ),

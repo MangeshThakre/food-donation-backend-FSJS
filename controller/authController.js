@@ -3,11 +3,9 @@ const CustomError = require("../utils/customError.js");
 const transporter = require("../config/emailTranspoter.js");
 const cookieOptions = require("../utils/cookieOptions.js");
 const crypto = require("crypto");
-const bcrypt = require("bcrypt");
 
 const signUp = async (req, res, next) => {
   const data = req.body;
-  return res.json({ data });
   try {
     const userInfo = new userModel(data);
     const result = await userInfo.save();
@@ -16,6 +14,7 @@ const signUp = async (req, res, next) => {
     return next(error);
   }
 };
+
 const signIn = async (req, res, next) => {
   const { password, email } = req.body;
   if (!email || !password) {
@@ -34,7 +33,8 @@ const signIn = async (req, res, next) => {
       res.cookie("Token", token, cookieOptions);
       return res.status(200).json({
         success: true,
-        token
+        token,
+        data: user
       });
     } else {
       return next(
@@ -47,7 +47,7 @@ const signIn = async (req, res, next) => {
 };
 const logout = async (req, res, next) => {
   try {
-    res.cookie("token", null, {
+    res.cookie("Token", null, {
       expires: new Date(Date.now()),
       httpOnly: true
     });
@@ -150,7 +150,7 @@ const getUser = async (req, res, next) => {
   const userId = req.user._id;
   try {
     const user = await userModel.findById(userId);
-    res.status(200).json({ success: true, data: user });
+    return res.status(200).json({ success: true, data: user });
   } catch (error) {
     next(error);
   }

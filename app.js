@@ -6,11 +6,18 @@ const errorHandler = require("./meddleware/errorHandler.js");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 
 app.use(cors({ origin: ["http://localhost:3000"], credentials: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/"
+  })
+);
 // routers
 app.use("/api/auth", authRouter);
 app.use("/api", donationRouter);

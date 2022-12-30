@@ -12,6 +12,23 @@ const createDonation = async (req, res, next) => {
   }
 };
 
+const updateDonation = async (req, res, next) => {
+  const { donorId } = req.params;
+  console.log(donorId);
+  const donationData = req.body;
+  console.log(donationData);
+  try {
+    const result = await donationModel.findByIdAndUpdate(
+      donorId,
+      donationData,
+      { runValidators: true, new: true }
+    );
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const getDonations = async (req, res, next) => {
   const { donorId } = req.query;
   const query = {};
@@ -25,4 +42,4 @@ const getDonations = async (req, res, next) => {
   }
 };
 
-module.exports = { createDonation, getDonations };
+module.exports = { createDonation, getDonations, updateDonation };
