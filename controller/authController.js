@@ -156,11 +156,27 @@ const getUser = async (req, res, next) => {
   }
 };
 
+const editUser = async (req, res, next) => {
+  const profileImage = req.user.profileImage;
+  const userId = req.user._id;
+  try {
+    const result = await userModel.findByIdAndUpdate(
+      userId,
+      { ...req.body, profileImage },
+      { runValidators: true, new: true }
+    );
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
   logout,
   forgotPassword,
   resetPassword,
-  getUser
+  getUser,
+  editUser
 };

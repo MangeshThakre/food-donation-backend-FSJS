@@ -3,12 +3,13 @@ const donationRouter = express.Router();
 const {
   createDonation,
   getDonations,
-  updateDonation
+  updateDonation,
+  getDonation
 } = require("../controller/donationController");
 const jwtAuth = require("../meddleware/jwtAuthenticaion");
-const DonationStatus = require("../utils/donationStatus");
 
 donationRouter.post("/donation", jwtAuth, createDonation);
+donationRouter.get("/donation/:donationId", jwtAuth, getDonation);
 donationRouter.get("/donations", jwtAuth, getDonations);
 donationRouter.put("/donation/:donorId", jwtAuth, updateDonation);
 

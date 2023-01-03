@@ -22,20 +22,7 @@ const userSchema = new Schema(
       required: [true, "Email is required"],
       unique: true
     },
-    address: new Schema(
-      {
-        country: { type: String, required: [true, "Countery is Required"] },
-        pinCode: {
-          type: Number,
-          required: [true, "Zip code/Area code is required"]
-        },
-        state: { type: String, required: [true, "State is Required"] },
-        city: { type: String, required: [true, "City is Required"] },
-        street: { type: String, required: [true, "Street is Requied"] },
-        building: { type: String }
-      },
-      { _id: false }
-    ),
+    address: { type: String },
     password: {
       type: String,
       required: [true, "password is required"],
@@ -46,6 +33,14 @@ const userSchema = new Schema(
       enum: Object.values(AuthRoles),
       default: AuthRoles.DONAOR
     },
+    phoneNo: { type: String, required: [true, "Phone no is required"] },
+    profileImage: new Schema(
+      {
+        imageId: { type: String, required: true },
+        url: { type: String, required: true }
+      },
+      { _id: false }
+    ),
     forgotPasswordExpiry: String,
     forgotPasswordExpiry: Date
   },

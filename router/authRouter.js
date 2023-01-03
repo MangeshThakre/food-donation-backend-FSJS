@@ -1,5 +1,6 @@
 const express = require("express");
 const jwtAuth = require("../meddleware/jwtAuthenticaion.js");
+const cloudinaryImageUpload = require("../meddleware/cloudinaryImageUpload.js");
 const authRouter = express.Router();
 const {
   signIn,
@@ -7,7 +8,8 @@ const {
   logout,
   forgotPassword,
   resetPassword,
-  getUser
+  getUser,
+  editUser
 } = require("../controller/authController");
 
 authRouter.post("/signup", signUp);
@@ -16,5 +18,6 @@ authRouter.get("/logout", logout);
 authRouter.post("/forgot_password", forgotPassword);
 authRouter.post("/reset_password/:token", resetPassword);
 authRouter.get("/user", jwtAuth, getUser);
+authRouter.patch("/user", jwtAuth, cloudinaryImageUpload, editUser);
 
 module.exports = authRouter;
