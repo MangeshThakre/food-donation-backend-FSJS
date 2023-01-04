@@ -64,4 +64,23 @@ const getDonation = async (req, res, next) => {
   }
 };
 
-module.exports = { createDonation, getDonations, updateDonation, getDonation };
+const removeDonation = async (req, res, next) => {
+  const { donationId } = req.params;
+  try {
+    const remove = await donationModel.findByIdAndDelete(donationId);
+    if (!remove) return next(new CustomError("Invalid donation Id", 400));
+    return res
+      .status(200)
+      .json({ success: true, message: "removed successfuly" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = {
+  createDonation,
+  getDonations,
+  updateDonation,
+  getDonation,
+  removeDonation
+};

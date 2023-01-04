@@ -4,13 +4,17 @@ const {
   createDonation,
   getDonations,
   updateDonation,
-  getDonation
+  getDonation,
+  removeDonation
 } = require("../controller/donationController");
 const jwtAuth = require("../meddleware/jwtAuthenticaion");
 
 donationRouter.post("/donation", jwtAuth, createDonation);
 donationRouter.get("/donation/:donationId", jwtAuth, getDonation);
 donationRouter.get("/donations", jwtAuth, getDonations);
+
 donationRouter.put("/donation/:donorId", jwtAuth, updateDonation);
+
+donationRouter.delete("/donation/:donationId", jwtAuth, removeDonation);
 
 module.exports = donationRouter;
