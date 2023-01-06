@@ -9,7 +9,8 @@ const {
   forgotPassword,
   resetPassword,
   getUser,
-  editUser
+  editUser,
+  getUsers
 } = require("../controller/authController");
 
 authRouter.post("/signup", signUp);
@@ -19,5 +20,6 @@ authRouter.post("/forgot_password", forgotPassword);
 authRouter.post("/reset_password/:token", resetPassword);
 authRouter.get("/user", jwtAuth, getUser);
 authRouter.patch("/user", jwtAuth, cloudinaryImageUpload, editUser);
+authRouter.get("/users", jwtAuth, getUsers);
 
 module.exports = authRouter;

@@ -10,10 +10,12 @@ const fileUpload = require("express-fileupload");
 
 app.use(
   cors({
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     origin: ["http://localhost:3000", "https://food-donation-fsjs.vercel.app"],
     credentials: true
   })
 );
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

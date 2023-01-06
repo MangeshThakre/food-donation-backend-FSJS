@@ -12,9 +12,7 @@ const jwtAuth = require("../meddleware/jwtAuthenticaion");
 donationRouter.post("/donation", jwtAuth, createDonation);
 donationRouter.get("/donation/:donationId", jwtAuth, getDonation);
 donationRouter.get("/donations", jwtAuth, getDonations);
-
-donationRouter.put("/donation/:donorId", jwtAuth, updateDonation);
-
+donationRouter.put("/donation/:donationId", jwtAuth, updateDonation);
 donationRouter.delete("/donation/:donationId", jwtAuth, removeDonation);
 
 module.exports = donationRouter;

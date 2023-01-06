@@ -170,6 +170,15 @@ const editUser = async (req, res, next) => {
     next(error);
   }
 };
+const getUsers = async (req, res, next) => {
+  const { role } = req.query;
+  try {
+    const response = await userModel.find({ role });
+    return res.status(200).json({ success: true, data: response });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 module.exports = {
   signUp,
@@ -178,5 +187,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getUser,
-  editUser
+  editUser,
+  getUsers
 };
