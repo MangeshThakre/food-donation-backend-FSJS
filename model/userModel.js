@@ -49,6 +49,8 @@ const userSchema = new Schema(
   }
 );
 
+//  search index on all field
+userSchema.index({ "$**" : "text" });
 // challenge 1 - encrypt password - hooks
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

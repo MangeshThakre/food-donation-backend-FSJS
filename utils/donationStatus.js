@@ -1,8 +1,8 @@
 const DonationStatus = {
   PENDING: "PENDING",
-  ACCEPETED: "ACCEPETED",
+  ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
   COLLECTED: "COLLECTED",
-  DELIVERD: "DELEVERD"
+  DELIVERD: "DELIVERD"
 };
 module.exports = DonationStatus;

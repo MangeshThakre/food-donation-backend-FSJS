@@ -3,6 +3,7 @@ const CustomError = require("../utils/customError.js");
 const transporter = require("../config/emailTranspoter.js");
 const cookieOptions = require("../utils/cookieOptions.js");
 const crypto = require("crypto");
+const DonationStatus = require("../utils/donationStatus.js");
 
 const signUp = async (req, res, next) => {
   const data = req.body;
@@ -171,10 +172,61 @@ const editUser = async (req, res, next) => {
   }
 };
 const getUsers = async (req, res, next) => {
-  const { role } = req.query;
+  const { role, page, limit, search } = req.query;
+
+  const PAGE = Number(page) || 1;
+  const LIMIT = Number(limit) || 10;
+  const startIndex = (PAGE - 1) * LIMIT;
+  const endIndex = PAGE * LIMIT;
+
+  const query = {};
+  if (role) query["role"] = role;
+  if (search)
+    query["$text"] = {
+      $search: search,
+      $caseSensitive: false,
+      $diacriticSensitive: true
+    };
+
   try {
-    const response = await userModel.find({ role });
-    return res.status(200).json({ success: true, data: response });
+    const totalAgents = await userModel.find(query).countDocuments();
+    const result = {};
+    if (endIndex < totalAgents) {
+      result.next = {
+        pageNumber: PAGE + 1,
+        limit: LIMIT
+      };
+    }
+    if (startIndex > 0) {
+      result.previous = {
+        pageNumber: PAGE - 1,
+        limit: LIMIT
+      };
+    }
+
+    result.agents = await userModel
+      .aggregate([
+        { $match: query },
+        {
+          $addFields: {
+            strAgentId: {
+              $toString: "$_id"
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: "donations",
+            localField: "strAgentId",
+            foreignField: "agentId",
+            as: "donations"
+          }
+        }
+        // { $unwind: "$donations" }
+      ])
+      .skip(startIndex)
+      .limit(LIMIT);
+    return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return next(error);
   }

@@ -32,7 +32,7 @@ const updateDonation = async (req, res, next) => {
 };
 
 const getDonations = async (req, res, next) => {
-  const { donorId, from, to, status, page, limit } = req.query;
+  const { donorId, from, to, status, page, limit, agentId } = req.query;
 
   if (from || to) {
     if (new Date(from) === "Invalid Date" || new Date(to) === "Invalid Date") {
@@ -48,6 +48,7 @@ const getDonations = async (req, res, next) => {
   const query = {};
   if (donorId) query["donorId"] = donorId;
   if (status) query["status"] = status;
+  if (agentId) query["agentId"] = agentId;
   if (from && to) {
     query["createdAt"] = {
       $gte: new Date(from).toISOString(),
