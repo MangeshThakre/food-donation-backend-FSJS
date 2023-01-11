@@ -3,7 +3,7 @@ const CustomError = require("../utils/customError.js");
 const transporter = require("../config/emailTranspoter.js");
 const cookieOptions = require("../utils/cookieOptions.js");
 const crypto = require("crypto");
-const DonationStatus = require("../utils/donationStatus.js");
+const mongoose = require("mongoose");
 
 const signUp = async (req, res, next) => {
   const data = req.body;
@@ -149,9 +149,55 @@ const resetPassword = async (req, res, next) => {
 };
 const getUser = async (req, res, next) => {
   const userId = req.query.userId || req.user._id;
-
+  const ObjectId = mongoose.Types.ObjectId;
   try {
-    const user = await userModel.findById(userId);
+    const [user] = await userModel.aggregate([
+      { $match: { _id: ObjectId(userId) } },
+      {
+        $addFields: {
+          str_id: userId
+        }
+      },
+      {
+        $lookup: {
+          from: "donations",
+          localField: "str_id",
+          foreignField: "agentId",
+          as: "donations"
+        }
+      },
+      {
+        $project: {
+          _id: "$_id",
+          email: "$email",
+          address: "$address",
+          role: "$role",
+          createdAt: "$createdAt",
+          firstName: "$firstName",
+          lastName: "$lastName",
+          profileImage: "$profileImage",
+          phoneNo: "$phoneNo",
+          delivered: {
+            $size: {
+              $filter: {
+                input: "$donations",
+                as: "item",
+                cond: { $eq: ["$$item.status", "DELIVERED"] }
+              }
+            }
+          },
+          accepted: {
+            $size: {
+              $filter: {
+                input: "$donations",
+                as: "item",
+                cond: { $eq: ["$$item.status", "ACCEPTED"] }
+              }
+            }
+          }
+        }
+      }
+    ]);
     return res.status(200).json({ success: true, data: user });
   } catch (error) {
     next(error);
@@ -174,7 +220,6 @@ const editUser = async (req, res, next) => {
 };
 const getUsers = async (req, res, next) => {
   const { role, page, limit, search } = req.query;
-
   const PAGE = Number(page) || 1;
   const LIMIT = Number(limit) || 10;
   const startIndex = (PAGE - 1) * LIMIT;
@@ -205,7 +250,7 @@ const getUsers = async (req, res, next) => {
       };
     }
 
-    result.agents = await userModel
+    result.users = await userModel
       .aggregate([
         { $match: query },
         {
@@ -222,9 +267,40 @@ const getUsers = async (req, res, next) => {
             foreignField: "agentId",
             as: "donations"
           }
+        },
+        {
+          $project: {
+            _id: "$_id",
+            email: "$email",
+            address: "$address",
+            role: "$role",
+            createdAt: "$createdAt",
+            firstName: "$firstName",
+            lastName: "$lastName",
+            profileImage: "$profileImage",
+            phoneNo: "$phoneNo",
+            delivered: {
+              $size: {
+                $filter: {
+                  input: "$donations",
+                  as: "item",
+                  cond: { $eq: ["$$item.status", "DELIVERED"] }
+                }
+              }
+            },
+            accepted: {
+              $size: {
+                $filter: {
+                  input: "$donations",
+                  as: "item",
+                  cond: { $eq: ["$$item.status", "ACCEPTED"] }
+                }
+              }
+            }
+          }
         }
-        // { $unwind: "$donations" }
       ])
+      .sort({ firstName: 1 })
       .skip(startIndex)
       .limit(LIMIT);
     return res.status(200).json({ success: true, data: result });

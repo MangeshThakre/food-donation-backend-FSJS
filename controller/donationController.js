@@ -14,7 +14,6 @@ const createDonation = async (req, res, next) => {
 
 const updateDonation = async (req, res, next) => {
   const { donationId } = req.params;
-  console.log(req.params);
   const donationData = req.body;
   try {
     const result = await donationModel.findByIdAndUpdate(
@@ -149,6 +148,7 @@ const getDonations = async (req, res, next) => {
           }
         }
       ])
+      .sort({ createdAt: -1 })
       .skip(startIndex)
       .limit(LIMIT);
     // console.log(result.donations);
