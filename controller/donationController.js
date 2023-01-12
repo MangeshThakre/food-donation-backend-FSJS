@@ -1,6 +1,6 @@
 const donationModel = require("../model/DonationModel.js");
 const CustomError = require("../utils/customError.js");
-
+const mongoose = require("mongoose");
 const createDonation = async (req, res, next) => {
   const donorId = req.user._id;
   try {
@@ -46,7 +46,7 @@ const getDonations = async (req, res, next) => {
 
   const query = {};
   if (donorId) query["donorId"] = donorId;
-  if (status) query["status"] = status;
+  if (status) query["status"] = { $in: status.split(" ") };
   if (agentId) query["agentId"] = agentId;
   if (from && to) {
     query["createdAt"] = {
@@ -54,7 +54,6 @@ const getDonations = async (req, res, next) => {
       $lte: new Date(to).toISOString()
     };
   }
-
   try {
     const totalDonation = await donationModel.find(query).countDocuments();
     const result = {};
@@ -160,8 +159,81 @@ const getDonations = async (req, res, next) => {
 
 const getDonation = async (req, res, next) => {
   const { donationId } = req.params;
+  const ObjectId = mongoose.Types.ObjectId;
   try {
-    const result = await donationModel.findById(donationId);
+    const [result] = await donationModel.aggregate([
+      { $match: { _id: ObjectId(donationId) } },
+      // add filed donorObjectId and agentObjectId if agentId  exist
+      {
+        $addFields: {
+          donorObjectId: {
+            $convert: {
+              input: "$donorId",
+              to: "objectId",
+              onError: "",
+              onNull: ""
+            }
+          },
+          agentObjectId: {
+            $convert: {
+              input: "$agentId",
+              to: "objectId",
+              onError: "",
+              onNull: ""
+            }
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "donorObjectId",
+          foreignField: "_id",
+          as: "donor"
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "agentObjectId",
+          foreignField: "_id",
+          as: "agent"
+        }
+      },
+      // unwind donor, and agent if agent is not empty array   /// donor and agent is lookup filed
+      { $unwind: "$donor" },
+      {
+        $unwind: {
+          path: "$agent",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      //// project required data
+      {
+        $project: {
+          _id: "$_id",
+          items: "$items",
+          pickUpAddress: "$pickUpAddress",
+          message: "$message",
+          status: "$status",
+          createdAt: "$createdAt",
+          donorId: "$donorId",
+          donorName: {
+            $concat: ["$donor.firstName", " ", "$donor.lastName"]
+          },
+          donorEmail: "$donor.email",
+          donorPhoneNo: "$donor.phoneNo",
+          donorImage: "$donor.profileImage.url",
+          agentId: "$agentId",
+          agentName: {
+            $concat: ["$agent.firstName", " ", "$agent.lastName"]
+          },
+          agentEmail: "$agent.email",
+          agentPhoneNo: "$agent.phoneNo",
+          agentImage: "$agent.profileImage.url"
+        }
+      }
+    ]);
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return next(error);

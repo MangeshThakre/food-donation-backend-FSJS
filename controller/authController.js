@@ -177,12 +177,12 @@ const getUser = async (req, res, next) => {
           lastName: "$lastName",
           profileImage: "$profileImage",
           phoneNo: "$phoneNo",
-          delivered: {
+          collected: {
             $size: {
               $filter: {
                 input: "$donations",
                 as: "item",
-                cond: { $eq: ["$$item.status", "DELIVERED"] }
+                cond: { $eq: ["$$item.status", "COLLECTED"] }
               }
             }
           },
@@ -203,7 +203,6 @@ const getUser = async (req, res, next) => {
     next(error);
   }
 };
-
 const editUser = async (req, res, next) => {
   const profileImage = req.user.profileImage;
   const userId = req.user._id;
@@ -279,12 +278,12 @@ const getUsers = async (req, res, next) => {
             lastName: "$lastName",
             profileImage: "$profileImage",
             phoneNo: "$phoneNo",
-            delivered: {
+            collected: {
               $size: {
                 $filter: {
                   input: "$donations",
                   as: "item",
-                  cond: { $eq: ["$$item.status", "DELIVERED"] }
+                  cond: { $eq: ["$$item.status", "COLLECTED"] }
                 }
               }
             },
