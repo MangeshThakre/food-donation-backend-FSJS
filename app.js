@@ -4,9 +4,9 @@ const authRouter = require("./router/authRouter.js");
 const donationRouter = require("./router/donationRouter.js");
 const errorHandler = require("./meddleware/errorHandler.js");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const userRouter = require("./router/userRouter.js");
 
 app.use(
   cors({
@@ -25,9 +25,11 @@ app.use(
     tempFileDir: "/tmp/"
   })
 );
+
 // routers
 app.use("/api/auth", authRouter);
 app.use("/api", donationRouter);
+app.use("/api", userRouter);
 app.use("/", (req, res) =>
   res.status(200).json({ success: true, server: "food donation Backend" })
 );

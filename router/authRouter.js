@@ -14,7 +14,7 @@ const {
 } = require("../controller/authController");
 
 authRouter.post("/signup", signUp);
-authRouter.post("/signin", signIn);
+authRouter.post("/signin", cloudinaryImageUpload, signIn);
 authRouter.get("/logout", logout);
 authRouter.post("/forgot_password", forgotPassword);
 authRouter.post("/reset_password/:token", resetPassword);
