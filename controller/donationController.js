@@ -50,10 +50,12 @@ const getDonations = async (req, res, next) => {
   if (agentId) query["agentId"] = agentId;
   if (from && to) {
     query["createdAt"] = {
-      $gte: new Date(from).toISOString(),
-      $lte: new Date(to).toISOString()
+      $gte: new Date(from),
+      $lte: new Date(to)
     };
   }
+
+
   try {
     const totalDonation = await donationModel.find(query).countDocuments();
     const result = {};
@@ -96,6 +98,7 @@ const getDonations = async (req, res, next) => {
 
         //  match query
         { $match: query },
+
         //  lookup from donor and agent from user collection
         {
           $lookup: {

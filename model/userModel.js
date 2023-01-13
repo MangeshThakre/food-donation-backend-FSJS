@@ -55,7 +55,6 @@ userSchema.index({ "$**": "text" });
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
-  console.log(this.password);
   next();
 });
 
@@ -96,10 +95,3 @@ userSchema.methods = {
 
 const userModel = mongoose.model("user", userSchema);
 module.exports = userModel;
-
-//  country       Country
-//  zip_code      Zip code
-//  state         State, province or prefecture
-//  city          City
-//  street        Street address
-//  building      Apt, office, suite, etc. (Optional)
