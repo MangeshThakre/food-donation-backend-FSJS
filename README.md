@@ -1,9 +1,23 @@
-# food-donation-backend-FSJS
-
-
-
+# Food donation system
 
 Created a web application which is useful for management of Food Donation and collection activities.
+
+
+🧑‍💻 technologies
+
+### FrontEnd
+
+* ⚛️ React.js
+* 🧩 TailwindCss
+
+### Backend
+
+* 💚 Node.js
+* 🛣️ Express.js
+* 🍃 MongoDB
+* 📩 Nodemailer (To send the email)
+* 🖼️ Cloudinary (To store the event images)
+* 🔐 JsonWebToken ( For Authentication)
 
 
 
