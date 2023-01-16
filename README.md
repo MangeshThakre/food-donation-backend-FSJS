@@ -4,7 +4,12 @@ Created a web application which is useful for management of Food Donation and co
 
  # [__👉 FrontEnd source code__](https://github.com/MangeshThakre/food-donation-frontend-FSJS)
  # [__👉 internship Offer Letter__](https://s3.ap-south-1.amazonaws.com/internship.ineuron.ai/letters/ef3b6155-5739-44d6-99c0-c5d7a8361ecf.pdf)
+ # [__👉 internship Offer Letter__](https://app.uizard.io/prototypes/EwqnPZjw10UyjKLq0n4V/player)
 
+
+
+
+https://app.uizard.io/p/149edc0a
 
 rasip19036@tohup.com
 
