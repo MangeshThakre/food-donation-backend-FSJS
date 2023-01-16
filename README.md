@@ -6,7 +6,7 @@ Created a web application which is useful for management of Food Donation and co
  # [__👉 internship Offer Letter__](https://s3.ap-south-1.amazonaws.com/internship.ineuron.ai/letters/ef3b6155-5739-44d6-99c0-c5d7a8361ecf.pdf)
 
 
-
+rasip19036@tohup.com
 
 
 🧑‍💻 technologies
