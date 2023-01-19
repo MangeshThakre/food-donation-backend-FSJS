@@ -18,8 +18,6 @@ authRouter.post("/signin", cloudinaryImageUpload, signIn);
 authRouter.get("/logout", logout);
 authRouter.post("/forgot_password", forgotPassword);
 authRouter.post("/reset_password/:token", resetPassword);
-authRouter.get("/user", jwtAuth, getUser);
-authRouter.patch("/user", jwtAuth, cloudinaryImageUpload, editUser);
-authRouter.get("/users", jwtAuth, getUsers);
+
 
 module.exports = authRouter;

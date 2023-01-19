@@ -3,7 +3,14 @@ const CustomError = require("../utils/customError.js");
 const transporter = require("../config/emailTranspoter.js");
 const cookieOptions = require("../utils/cookieOptions.js");
 const crypto = require("crypto");
-const mongoose = require("mongoose");
+
+/******************************************************
+ * @SIGNUP
+ * @route /api/auth/signUp
+ * @description   singin functin for creating new user
+ * @body firstname , lastname,  email, password ,comfirmPassword
+ * @returns User Object
+ ******************************************************/
 
 const signUp = async (req, res, next) => {
   const data = req.body;
@@ -16,6 +23,14 @@ const signUp = async (req, res, next) => {
   }
 };
 
+/******************************************************
+ * @SIGIN
+ * @route /api/auth/signIN
+ * @description  returns user object of the cradentials is correct with token
+ * @body  email, password
+ * @returns User Object
+ ******************************************************/
+
 const signIn = async (req, res, next) => {
   const { password, email } = req.body;
   if (!email || !password) {
@@ -24,7 +39,7 @@ const signIn = async (req, res, next) => {
   try {
     const user = await userModel.findOne({ email }).select("+password");
     if (!user) {
-      return next(new CustomError("Invalid credentials", 400));
+      return next(new CustomError("you are not registered", 400));
     }
 
     const isPasswordMatched = await user.comparePassword(password);
@@ -34,7 +49,7 @@ const signIn = async (req, res, next) => {
       res.cookie("Token", token, cookieOptions);
       return res.status(200).json({
         success: true,
-        token,
+        token: token,
         data: user
       });
     } else {
@@ -46,6 +61,14 @@ const signIn = async (req, res, next) => {
     return next(error);
   }
 };
+
+/******************************************************
+ * @LOGOUT
+ * @route /api/auth/logout
+ * @description  remove the token form  cookie
+ * @returns User Object
+ ******************************************************/
+
 const logout = async (req, res, next) => {
   try {
     res.cookie("Token", null, {
@@ -60,6 +83,15 @@ const logout = async (req, res, next) => {
     next(error);
   }
 };
+
+/******************************************************
+ * @FORGETPASSWORD
+ * @route /api/auth/forgot_password
+ * @description  forgetPassword function send mail with resptore password url and restore password token
+ * @body email
+ * @returns message
+ ******************************************************/
+
 const forgotPassword = async (req, res, next) => {
   const { email } = req.body;
   if (!email) return next(CustomError("Email is required", 400));
@@ -90,14 +122,25 @@ const forgotPassword = async (req, res, next) => {
         await user.save();
         return next(error);
       }
-      return res
-        .status(200)
-        .json({ success: true, message: "check you email" });
+      return res.status(200).json({
+        success: true,
+        message: "Furthre instrunctions sent on you email " + email
+      });
     });
   } catch (error) {
     return next(error);
   }
 };
+
+/******************************************************
+ * @RESETPASSWORD
+ * @route /api/auth/reset_password
+ * @description  reset password and jenerate JWT token
+ * @body password conform password
+ * @params token
+ * @returns return token
+ ******************************************************/
+
 const resetPassword = async (req, res, next) => {
   const { token } = req.params;
   const { password, confirmPassword } = req.body;
@@ -147,174 +190,11 @@ const resetPassword = async (req, res, next) => {
     return next(error);
   }
 };
-const getUser = async (req, res, next) => {
-  const userId = req.query.userId || req.user._id;
-  const ObjectId = mongoose.Types.ObjectId;
-  try {
-    const [user] = await userModel.aggregate([
-      { $match: { _id: ObjectId(userId) } },
-      {
-        $addFields: {
-          str_id: userId
-        }
-      },
-      {
-        $lookup: {
-          from: "donations",
-          localField: "str_id",
-          foreignField: "agentId",
-          as: "donations"
-        }
-      },
-      {
-        $project: {
-          _id: "$_id",
-          email: "$email",
-          address: "$address",
-          role: "$role",
-          createdAt: "$createdAt",
-          firstName: "$firstName",
-          lastName: "$lastName",
-          profileImage: "$profileImage",
-          phoneNo: "$phoneNo",
-          collected: {
-            $size: {
-              $filter: {
-                input: "$donations",
-                as: "item",
-                cond: { $eq: ["$$item.status", "COLLECTED"] }
-              }
-            }
-          },
-          accepted: {
-            $size: {
-              $filter: {
-                input: "$donations",
-                as: "item",
-                cond: { $eq: ["$$item.status", "ACCEPTED"] }
-              }
-            }
-          }
-        }
-      }
-    ]);
-    return res.status(200).json({ success: true, data: user });
-  } catch (error) {
-    next(error);
-  }
-};
-const editUser = async (req, res, next) => {
-  const profileImage = req.user.profileImage;
-  const userId = req.user._id;
-  try {
-    const result = await userModel.findByIdAndUpdate(
-      userId,
-      { ...req.body, profileImage },
-      { runValidators: true, new: true }
-    );
-    res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    next(error);
-  }
-};
-const getUsers = async (req, res, next) => {
-  const { role, page, limit, search } = req.query;
-  const PAGE = Number(page) || 1;
-  const LIMIT = Number(limit) || 10;
-  const startIndex = (PAGE - 1) * LIMIT;
-  const endIndex = PAGE * LIMIT;
-
-  const query = {};
-  if (role) query["role"] = role;
-  if (search)
-    query["$text"] = {
-      $search: search,
-      $caseSensitive: false,
-      $diacriticSensitive: true
-    };
-
-  try {
-    const totalAgents = await userModel.find(query).countDocuments();
-    const result = {};
-    if (endIndex < totalAgents) {
-      result.next = {
-        pageNumber: PAGE + 1,
-        limit: LIMIT
-      };
-    }
-    if (startIndex > 0) {
-      result.previous = {
-        pageNumber: PAGE - 1,
-        limit: LIMIT
-      };
-    }
-
-    result.users = await userModel
-      .aggregate([
-        { $match: query },
-        {
-          $addFields: {
-            strAgentId: {
-              $toString: "$_id"
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: "donations",
-            localField: "strAgentId",
-            foreignField: "agentId",
-            as: "donations"
-          }
-        },
-        {
-          $project: {
-            _id: "$_id",
-            email: "$email",
-            address: "$address",
-            role: "$role",
-            createdAt: "$createdAt",
-            firstName: "$firstName",
-            lastName: "$lastName",
-            profileImage: "$profileImage",
-            phoneNo: "$phoneNo",
-            collected: {
-              $size: {
-                $filter: {
-                  input: "$donations",
-                  as: "item",
-                  cond: { $eq: ["$$item.status", "COLLECTED"] }
-                }
-              }
-            },
-            accepted: {
-              $size: {
-                $filter: {
-                  input: "$donations",
-                  as: "item",
-                  cond: { $eq: ["$$item.status", "ACCEPTED"] }
-                }
-              }
-            }
-          }
-        }
-      ])
-      .sort({ firstName: 1 })
-      .skip(startIndex)
-      .limit(LIMIT);
-    return res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    return next(error);
-  }
-};
 
 module.exports = {
   signUp,
   signIn,
   logout,
   forgotPassword,
-  resetPassword,
-  getUser,
-  editUser,
-  getUsers
+  resetPassword
 };

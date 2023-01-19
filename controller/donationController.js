@@ -1,6 +1,16 @@
 const donationModel = require("../model/DonationModel.js");
 const CustomError = require("../utils/customError.js");
 const mongoose = require("mongoose");
+
+/******************************************************
+ * @CREATECONATION
+ * @route /api/donation
+ * @method POST
+ * @description  insert new donation
+ * @body donation details
+ * @returns return object
+ ******************************************************/
+
 const createDonation = async (req, res, next) => {
   const donorId = req.user._id;
   try {
@@ -11,6 +21,16 @@ const createDonation = async (req, res, next) => {
     next(error);
   }
 };
+
+/******************************************************
+ * @UPDATEDONATION
+ * @route /api/donation/:dinationId
+ * @method PUT
+ * @description  update donation
+ * @body donation details
+ * @params donationId
+ * @returns return updated  object
+ ******************************************************/
 
 const updateDonation = async (req, res, next) => {
   const { donationId } = req.params;
@@ -29,6 +49,15 @@ const updateDonation = async (req, res, next) => {
     return next(error);
   }
 };
+
+/******************************************************
+ * @GETDONATIONS
+ * @route /api/donationS
+ * @method GET
+ * @description get donation array of object base on query
+ * @query  donorId, from, to, status, page, limit, agentId
+ * @returns return array of object
+ ******************************************************/
 
 const getDonations = async (req, res, next) => {
   const { donorId, from, to, status, page, limit, agentId } = req.query;
@@ -54,7 +83,6 @@ const getDonations = async (req, res, next) => {
       $lte: new Date(to)
     };
   }
-
 
   try {
     const totalDonation = await donationModel.find(query).countDocuments();
@@ -160,6 +188,15 @@ const getDonations = async (req, res, next) => {
   }
 };
 
+/******************************************************
+ * @GETDONATION
+ * @route /api/donation/:dinationId
+ * @method GET
+ * @description get the donation base on donation Id with extra details
+ * @params  donation id
+ * @returns return object
+ ******************************************************/
+
 const getDonation = async (req, res, next) => {
   const { donationId } = req.params;
   const ObjectId = mongoose.Types.ObjectId;
@@ -237,11 +274,26 @@ const getDonation = async (req, res, next) => {
         }
       }
     ]);
+
+    //
+    if (!result) {
+      return next(new CustomError("invalid _id", 400));
+    }
+
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return next(error);
   }
 };
+
+/******************************************************
+ * @REMOVEDONATION
+ * @route /api/donation/:dinationId
+ * @method DELETE
+ * @description delete donation base on donation Id with extra details
+ * @params  donation id
+ * @returns return message
+ ******************************************************/
 
 const removeDonation = async (req, res, next) => {
   const { donationId } = req.params;
