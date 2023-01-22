@@ -19,5 +19,4 @@ authRouter.get("/logout", logout);
 authRouter.post("/forgot_password", forgotPassword);
 authRouter.post("/reset_password/:token", resetPassword);
 
-
 module.exports = authRouter;

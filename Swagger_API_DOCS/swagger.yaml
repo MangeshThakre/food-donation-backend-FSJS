@@ -1,0 +1,43 @@
+openapi: 3.0.0
+info:
+  title: Food donation system
+  description: Food donation system is useful for the management of Food Donation and collection activities. - Mangesh Thakre
+  version: 1.0.0
+
+servers:
+  - url: "https://food-donation-fsjs.vercel.app/api/"
+    description: live version of app
+  - url: "http://localhost:8081/api"
+    description: localhost version of app
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+    cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
+      type: apiKey
+      in: cookie
+      name: JSESSIONID #
+
+# 2) Apply cookie auth globally to all operations
+security:
+  - cookieAuth: []
+  - BearerAuth:[]
+
+paths:
+  # user
+  /get_todos:
+    get:
+      tags:
+        - USER
+      summary: Return users
+      responses:
+        "200": # status code
+          description: "returns an array of objects"
+          content:
+            application/json:
+              schema:
