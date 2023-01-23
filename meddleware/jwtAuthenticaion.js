@@ -3,8 +3,9 @@ const CustomError = require("../utils/customError.js");
 
 const jwtAuth = (req, res, next) => {
   const token =
-    req.headers.authorization && req.headers["authorization"].split(" ")[1];
-  req.cookies && Object.keys(req.cookies).length >= 1 && req.cookies.Token;
+    (req.headers.authorization && req.headers["authorization"].split(" ")[1]) ||
+    (req.cookies && Object.keys(req.cookies).length >= 1 && req.cookies.Token);
+
   if (!token) {
     return next(new CustomError("NOT authorized", 401));
   }

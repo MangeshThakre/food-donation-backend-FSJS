@@ -35,7 +35,6 @@ const donationSchema = new Schema({
     enum: Object.values(DonationStatus),
     default: DonationStatus.PENDING
   },
-  profileImg: { typoe: String },
   createdAt: {
     type: Date,
     default: currentDate

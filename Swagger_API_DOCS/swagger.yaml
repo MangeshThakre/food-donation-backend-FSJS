@@ -12,32 +12,1102 @@ servers:
 
 components:
   securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-    BearerAuth:
-      type: http
-      scheme: bearer
     cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
       type: apiKey
       in: cookie
-      name: JSESSIONID #
+      name: Token
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # optional, for documentation purposes only
 
 # 2) Apply cookie auth globally to all operations
 security:
+  - bearerAuth: []
   - cookieAuth: []
-  - BearerAuth:[]
 
 paths:
-  # user
-  /get_todos:
+
+  # AUTHENTICATION
+  
+  # signup
+  /auth/signup:
+   post:
+    tags:
+     - AUTHENTICATION
+    summary : register new user 
+    consumes:
+      - application/json
+    produces:
+      - applications/json
+    requestBody:
+      required: true
+      content:
+        application/json : # Media type
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+                format : email
+              phoneNo:
+                type: string
+                example : 9653213542
+              address:
+                type: string
+              password:
+                type: string
+                minLength : 8
+                maxLength : 8
+              confirmPassword:
+                type: string
+    responses:
+        "200": # status code
+          description: "returns an object"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      phoneNo:
+                        type: integer
+                      role: 
+                       type : string  
+                      profileImage:
+                        type: object
+                        properties:
+                          imageId:
+                            type: string
+                          url:
+                            type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string                                             
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string     
+  # signin
+  /auth/signin:
+   post:
+    tags:
+    - AUTHENTICATION
+    summery : sign in (authenticate user)
+    consumes:
+      - application/json
+    produces:
+      - applications/json  
+    requestBody:
+      required: true
+      content:
+        application/json : # Media type
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format : email
+              password:
+                type: string
+                minLength : 8
+                maxLength : 8
+                format : password
+    responses:
+        '200':
+          description: >
+            Successfully authenticated.
+            The session ID returned in a response `Token`. You need to include this ID in subsequent requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean   
+                  token : 
+                    type : string
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      email:
+                        type: string
+                        format : email
+                      address:
+                        type: string
+                      role:
+                        type: string
+                      createdAt:
+                        type: date-time
+                        description: RFC3339 Datetime to set
+                        formate: date-time
+                        example: "2023-01-20T00:00:00+00:00"
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      phoneNo:
+                        type: integer
+                        example : 9653213542
+                      role: 
+                       type : string
+                       enum : [DONOR,AGENT,ADMIN]  
+                      profileImage:
+                        type: object
+                        properties:
+                          imageId:
+                            type: string
+                          url:
+                            type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string                            
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                               
+
+  # USER
+  /user:
+  # GET   get user base on user id or authenticated user
     get:
       tags:
         - USER
-      summary: Return users
+      summary: Return authenticated user object
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          description: user id (optional)
       responses:
         "200": # status code
           description: "returns an array of objects"
           content:
             application/json:
               schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      email:
+                        type: string
+                      address:
+                        type: string
+                      role:
+                        type: string
+                      createdAt:
+                        type: date-time
+                        description: RFC3339 Datetime to set
+                        formate: date-time
+                        example: "2023-01-20T00:00:00+00:00"
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      profileImage:
+                        type: object
+                        properties:
+                          imageId:
+                            type: string
+                          url:
+                            type: string
+                      phoneNo:
+                        type: integer
+                        example : 9653213542
+                      collected:
+                        type: integer
+                      accepted:
+                        type: integer
+                      role: 
+                       type : string  
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string     
+  # POST add new user (agent)
+    post:
+      tags:
+        - USER
+      summary: Add new USER, only admin can add user
+      consumes:
+        - application/json
+      produces:
+        - applications/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format : email
+                phoneNo:
+                  type: string
+                  example : 9876543210
+                address:
+                  type: string
+                password:
+                  type: string
+                  minLength : 8
+                  maxLength : 8
+                confirmPassword:
+                  type: string
+                  minLength : 8
+                  maxLength : 8
+                profileImage: # image
+                  type: string
+                  format: binary
+                role: 
+                  type : string                  
+      responses:
+        "200": # status code
+          description: "returns an object"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      phoneNo:
+                        type: integer
+                        example : 9876543210
+                      role: 
+                       type : string  
+                      profileImage:
+                        type: object
+                        properties:
+                          imageId:
+                            type: string
+                          url:
+                            type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string   
+  # PATCH  update user
+    patch:
+      tags:
+        - USER
+      summary: update USER detail (authenticated user)
+      consumes:
+        - application/json
+      produces:
+        - applications/json
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format : email
+                phoneNo:
+                  type: string
+                  exapmle: 9876543210
+                address:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+                profileImage: # image
+                  type: string
+                  format: binary
+                role: 
+                  type : string                  
+      responses:
+        "200": # status code
+          description: "returns an object"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                        format : email
+                      phoneNo:
+                        type: integer
+                        example : 9653213542
+                      role: 
+                       type : string  
+                      profileImage:
+                        type: object
+                        properties:
+                          imageId:
+                            type: string
+                          url:
+                            type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string  
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                         
+
+  /users:
+  # GET  // get user base on user id or authenticated user
+    get:
+      tags:
+        - USER
+      summary: Return  users object
+      parameters:
+        - in: query
+          name : role  # role query
+          schema:
+            type: string
+          allowReserved: true  
+          description: user role
+        - in: query  
+          name : search # search query
+          schema:
+            type: string
+          allowReserved: true  
+          description: search user by name
+        - in: query
+          name : page  # page query
+          schema:
+            type: integer
+          allowReserved: true  
+          description: page no.
+        - in: query
+          name : limit
+          schema:
+            type: integer
+          allowReserved: true  
+          description: limit user objects in every request                    
+      responses:
+        "200": # status code
+          description: "returns an object contains pagination info and users array"
+          content:
+            application/json:
+              schema:
+               type: object
+               properties:
+                next:
+                 type : object
+                 properties:
+                  pageNumber :
+                   type : integer
+                   default: 1
+                  limit : 
+                   type : integer
+                   default : 10 
+                previous:
+                 type : object
+                 properties:
+                  pageNumber : 
+                   type : integer
+                   default: 0
+                  limit : 
+                   type : integer
+                   default : 10
+                users: 
+                 type: array
+                 items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    email:
+                      type: string
+                    address:
+                      type: string
+                    role:
+                      type: string
+                    createdAt:
+                      type: date-time
+                      description: RFC3339 Datetime to set
+                      formate: date-time
+                      example: "2023-01-20T00:00:00+00:00"
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    profileImage:
+                      type: object
+                      properties:
+                        imageId:
+                          type: string
+                        url:
+                          type: string
+                    phoneNo:
+                      type: integer
+                      example : 98765433120
+                    email: 
+                     type: string
+                     format : email  
+                    collected:
+                      type: integer
+                    accepted:
+                      type: integer
+                    role: 
+                     type : string 
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string                    
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string   
+
+
+
+ # DONATION
+  /donation/{donationId}:
+  # GET donation with donation Id parameter
+    get:
+      tags:
+        - DONATION
+      summary: return Donation object 
+      parameters:
+        - in: path
+          name: donationId   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The donation ID
+      responses:
+        "200": # status code
+          description: "returns an array of objects"
+          content:
+            application/json:
+              schema: 
+               type : object
+               properties:
+                _id: 
+                 type: string
+                items: 
+                 type : array
+                 items:
+                  type : object
+                  properties:
+                    item: 
+                     type : string
+                    quantity: 
+                     type: number
+                     default : 1
+                    unit :
+                     type: string
+                pickupaddress: 
+                 type: string
+                message :
+                 type: string
+                status:
+                 type: string
+                createdAt: 
+                 type: string
+                donorId: 
+                 type: string
+                agentId:
+                 type: string 
+                donorName : 
+                 type : string
+                donorEmail :
+                 type: string
+                 format : email
+                donaorImage :
+                 type: string
+                donorPhoneNo:
+                 type : integer
+                 example: 9756456542
+                agentName:
+                 type: string
+                agentEmail:
+                 type: string
+                 format : email
+                agentPhoneNo: 
+                 type : integer
+                 example: 9756456542
+                agentImage :
+                 type : string    
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        "500": 
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string   
+  # PUT add new donation
+    put:    
+      tags:
+        - DONATION
+      summary: update donation
+      consumes : 
+        - application/json
+      produces : 
+        - applications/json
+      requestBody:
+        required : true
+        content : 
+          application/json :
+            schema :
+             type : object
+             properties : 
+              donorId : 
+                type : string
+              items: 
+               type : array
+               items:
+                type : object
+                properties:
+                  item: 
+                   type : string
+                  quantity: 
+                   type: number
+                   default : 1
+                  unit :
+                   type: string
+                   enum: [kilogram, liter]
+              pickUpAddress: 
+               type : string
+              message : 
+               type : string
+              status : 
+               type : string   
+      responses:
+        "200": # status code
+          description: "Returns updated donation object"
+          content:
+            application/json:
+             schema :
+              type : object
+              properties : 
+               _id :
+                type: string
+               donorId: 
+                 type: string
+               items: 
+                type: array
+                items:
+                 type: object
+                 properties:
+                   item: 
+                    type: string
+                   quantity: 
+                    type: number
+                    default: 1
+                   unit:
+                    type: string
+                    enum: [kilogram, liter]
+               pickUpAddress: 
+                type : string
+               message : 
+                type : string
+               status : 
+                type : string  
+               createdAt:
+                 type: date-time
+                 description: RFC3339 Datetime to set
+                 formate: date-time
+                 example: "2023-01-20T00:00:00+00:00"    
+        "400":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                    
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string    
+  # DELETE   delete donation
+    delete:
+      parameters:
+        - in: path
+          name: donationId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The donation  Id
+      tags:
+        - DONATION
+      summary: returns delete message
+      responses:
+        "200": # status code
+          description: "returns message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string  
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                    
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string   
+  # POST add new donation
+    post:
+      tags:
+        - DONATION
+      summary: Add new donation
+      consumes : 
+        - application/json
+      produces : 
+        - applications/json
+      requestBody:
+        required : true
+        content : 
+          application/json :
+            schema :
+             type : object
+             properties : 
+              donorId : 
+                type : string
+              items: 
+               type : array
+               items:
+                type : object
+                properties:
+                  item: 
+                   type : string
+                  quantity: 
+                   type: number
+                   default : 1
+                  unit :
+                   type: string
+                   enum: [kilogram, liter]
+              pickUpAddress: 
+               type : string
+              message : 
+               type : string
+              status : 
+               type : string   
+      responses:
+        "200": # status code
+          description: "Returns donation object"
+          content:
+            application/json:
+             schema :
+              type : object
+              properties : 
+               _id :
+                type: string
+               donorId: 
+                 type: string
+               items: 
+                type: array
+                items:
+                 type: object
+                 properties:
+                   item: 
+                    type: string
+                   quantity: 
+                    type: number
+                    default: 1
+                   unit:
+                    type: string
+                    enum: [kilogram, liter]
+               pickUpAddress: 
+                type : string
+               message : 
+                type : string
+               status : 
+                type : string
+               createdAt:
+                 type: date-time
+                 description: RFC3339 Datetime to set
+                 formate: date-time
+                 example: "2023-01-20T00:00:00+00:00"    
+        "400":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string            
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string   
+ 
+  /donations:   
+  # GET all donation base on query
+    get:
+      tags:
+        - DONATION
+      summary: Return  donation objects base on query
+      parameters:
+        - in: query
+          name : donorId  # donorId query
+          schema:
+            type: string
+          allowReserved: true  
+          description: user role
+        - in: query  
+          name : agentId # agentId query
+          schema:
+            type: string
+          allowReserved: true  
+          description: search user by name
+        - in: query
+          name : form # from query
+          schema:
+           type: date-time
+           description: RFC3339 Datetime to set
+           formate: date-time
+           example: "2023-01-20T00:00:00+00:00"
+          allowReserved: true  
+          description: sort donation Date from 
+        - in: query
+          name : to # to query
+          schema:
+           type: date-time
+           description: RFC3339 Datetime to set
+           formate: date-time
+           example: "2023-01-20T00:00:00+00:00"
+          allowReserved: true  
+          description: sort donation date to                      
+        - in: query
+          name : page  # page query
+          schema:
+            type: integer
+          allowReserved: true  
+          description: page no.
+        - in: query
+          name : limit # limit query
+          schema:
+            type: integer
+          allowReserved: true  
+          description: limit user objects in every request                    
+      responses:
+        "200": # status code
+          description: "returns an object contains pagination info and users array"
+          content:
+            application/json:
+              schema:
+               type: object
+               properties:
+                next:
+                 type : object
+                 properties:
+                  pageNumber :
+                   type : integer
+                   default: 1
+                  limit : 
+                   type : integer
+                   default : 10 
+                previous:
+                 type : object
+                 properties:
+                  pageNumber : 
+                   type : integer
+                   default: 0
+                  limit : 
+                   type : integer
+                   default : 10
+                users: 
+                 type: array
+                 items:
+                  type: object
+                  properties:
+                    item: 
+                     type : string
+                    quantity: 
+                     type: number
+                     default : 1
+                    unit :
+                     type: string
+                pickupaddress: 
+                 type: string
+                message :
+                 type: string
+                status:
+                 type: string
+                createdAt: 
+                 type: string
+                donorId: 
+                 type: string
+                agentId:
+                 type: string 
+                donorName : 
+                 type : string
+                donorEmail :
+                 type: string
+                 format : email
+                donaorImage :
+                 type: string
+                donorPhoneNo:
+                 type : integer
+                 example: 9756456542
+                agentName:
+                 type: string
+                agentEmail:
+                 type: string
+                 format : email
+                agentPhoneNo: 
+                 type : integer
+                 example: 9756456542
+                agentImage :
+                 type : string  
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string                    
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string   
+
+
+
+
+
+
+
+
+
+
+
+
+
