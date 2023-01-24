@@ -52,9 +52,9 @@ const getUsers = async (req, res, next) => {
     };
 
   try {
-    const totalAgents = await userModel.find(query).countDocuments();
+    const totalUsers = await userModel.find(query).countDocuments();
     const result = {};
-    if (endIndex < totalAgents) {
+    if (endIndex < totalUsers) {
       result.next = {
         pageNumber: PAGE + 1,
         limit: LIMIT
@@ -67,12 +67,24 @@ const getUsers = async (req, res, next) => {
       };
     }
 
+    function donationCountBaseOnStatus(status) {
+      return {
+        $size: {
+          $filter: {
+            input: "$donations",
+            as: "item",
+            cond: { $eq: ["$$item.status", status] }
+          }
+        }
+      };
+    }
+
     result.users = await userModel
       .aggregate([
         { $match: query },
         {
           $addFields: {
-            strAgentId: {
+            strUserId: {
               $toString: "$_id"
             }
           }
@@ -80,8 +92,10 @@ const getUsers = async (req, res, next) => {
         {
           $lookup: {
             from: "donations",
-            localField: "strAgentId",
-            foreignField: "agentId",
+            localField: "strUserId",
+            foreignField:
+              (role === "AGENT" && "agentId") ||
+              (role === "DONOR" && "donorId"),
             as: "donations"
           }
         },
@@ -96,24 +110,10 @@ const getUsers = async (req, res, next) => {
             lastName: "$lastName",
             profileImage: "$profileImage",
             phoneNo: "$phoneNo",
-            collected: {
-              $size: {
-                $filter: {
-                  input: "$donations",
-                  as: "item",
-                  cond: { $eq: ["$$item.status", "COLLECTED"] }
-                }
-              }
-            },
-            accepted: {
-              $size: {
-                $filter: {
-                  input: "$donations",
-                  as: "item",
-                  cond: { $eq: ["$$item.status", "ACCEPTED"] }
-                }
-              }
-            }
+            collected: donationCountBaseOnStatus("COLLECTED"),
+            accepted: donationCountBaseOnStatus("ACCEPTED"),
+            rejected: donationCountBaseOnStatus("REJECTED"),
+            pending: donationCountBaseOnStatus("PENDING")
           }
         }
       ])
