@@ -38,6 +38,7 @@ function socketCallback(connectedUsers, socket) {
   console.log(Object.keys(connectedUsers));
 }
 
+////
 async function handleUserNotification(notificationData, socketInstance, CB) {
   try {
     const notificationInfo = new notificationModel(notificationData);
@@ -50,6 +51,7 @@ async function handleUserNotification(notificationData, socketInstance, CB) {
   }
 }
 
+// get sockit instance  base on user id or base on role if user role is admin
 function getSocketInstance(connectedUsers, role, id) {
   if (role === "ADMIN") {
     for (const socketInstancekey in connectedUsers) {

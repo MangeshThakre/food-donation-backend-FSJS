@@ -14,11 +14,11 @@ const getNorifications = async (req, res, next) => {
   const query = {};
   if (userRole === "ADMIN") {
     query["role"] = userRole;
-  } else {
-    query["role"] = userRole;
-    query["_id"] = userId;
+  } else if (userRole === "DONOR") {
+    query["donorId"] = userId;
+  } else if (userRole === "AGENT") {
+    query["agentId"] = userId;
   }
-
   try {
     const totalnotification = await notificationModel
       .find(query)
@@ -41,10 +41,25 @@ const getNorifications = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .skip(startIndex)
       .limit(LIMIT);
+
     if (!result) return next(new CustomError("invalid request", "400"));
     res.status(200).json({ success: true, data: result });
   } catch (error) {
     next(error);
   }
 };
-module.exports = { getNorifications };
+
+const removeNotitication = async (req, res, next) => {
+  const { notificationId } = req.params;
+  try {
+    const result = await notificationModel.findByIdAndDelete(notificationId);
+    if (!result) return next(new CustomError("invalid Id", 400));
+    return res
+      .status(200)
+      .json({ successs: true, message: "notification removed successfuly" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = { getNorifications, removeNotitication };
