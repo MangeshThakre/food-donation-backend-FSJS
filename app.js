@@ -2,7 +2,9 @@ const express = require("express");
 const app = express();
 const authRouter = require("./router/authRouter.js");
 const donationRouter = require("./router/donationRouter.js");
+const notificationRouter = require("./router/norificationRouter.js");
 const errorHandler = require("./meddleware/errorHandler.js");
+
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
@@ -38,6 +40,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/auth", authRouter);
 app.use("/api", donationRouter);
 app.use("/api", userRouter);
+app.use("/api", notificationRouter);
 app.use("/", (req, res) =>
   res.status(200).json({ success: true, server: "food donation Backend" })
 );

@@ -10,11 +10,15 @@ function socketCallback(connectedUsers, socket) {
     connectedUsers[user.id] = socket;
   });
 
+  // loop over the norificationdataArr and send notification to the respective user given in the notificationtata (agentId or donorId),
+  // if the role is ADMIN then send the data to the admin
   socket.on("notification", (notificationDataArr, CB) => {
     for (const notificationData of notificationDataArr) {
+      const id = notificationData.donorId || notificationData.agentId || null;
       const socketInstance = getSocketInstance(
         connectedUsers,
-        notificationData.role
+        notificationData.role,
+        id
       );
       handleUserNotification(notificationData, socketInstance, CB);
     }
@@ -37,18 +41,20 @@ function socketCallback(connectedUsers, socket) {
 async function handleUserNotification(notificationData, socketInstance, CB) {
   try {
     const notificationInfo = new notificationModel(notificationData);
-    await notificationInfo.save();
-    socketInstance.emit("private_notification", notificationData);
+    const result = await notificationInfo.save();
+    if (socketInstance) {
+      socketInstance.emit("private_notification", result);
+    }
   } catch (error) {
     CB({ success: false, message: error.message });
   }
 }
 
-function getSocketInstance(connectedUsers, role, id = "") {
+function getSocketInstance(connectedUsers, role, id) {
   if (role === "ADMIN") {
-    for (const socketInstance in connectedUsers) {
-      if (socketInstance.userRole === "ADMIN") {
-        return socketInstance;
+    for (const socketInstancekey in connectedUsers) {
+      if (connectedUsers[socketInstancekey].userRole === "ADMIN") {
+        return connectedUsers[socketInstancekey];
       }
     }
   }
