@@ -9,9 +9,11 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const userRouter = require("./router/userRouter.js");
-const YAML = require("yamljs");
-const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = YAML.load("./Swagger_API_DOCS/swagger.yaml");
+
+// swagger
+// const YAML = require("yamljs");
+// const swaggerUi = require("swagger-ui-express");
+// const swaggerDocument = YAML.load("./Swagger_API_DOCS/swagger.yaml");
 
 app.use(
   cors({
