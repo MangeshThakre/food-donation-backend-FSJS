@@ -12,6 +12,7 @@ const server = app.listen(process.env.PORT, () =>
 const io = socketIO(server, { cors: { origin: "*" } });
 
 const connectedUsers = {};
+
 io.on("connection", (socket) => {
   socketCallback(connectedUsers, socket);
 });

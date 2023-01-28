@@ -34,7 +34,7 @@ app.use(
 
 // ROUTES
 // swagger
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // rest api
 app.use("/api/auth", authRouter);
