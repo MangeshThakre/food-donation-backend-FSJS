@@ -8,7 +8,7 @@ const server = app.listen(process.env.PORT, () =>
   console.log(`server listning at http://localhost:${8081}`)
 );
 
-// serverless not support socket.io
+// serverless not support socket.io install socket.io befor running on server like aws ec2
 // run socket on server
 // const io = socketIO(server, { cors: { origin: "*" } });
 // const connectedUsers = {};
