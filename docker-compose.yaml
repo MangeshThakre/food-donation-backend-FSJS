@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  food-donation-system:
+    image: "mangeshthakre/food-donation-system:1.0.0.RELEASE"
+    labels:
+      environment: ${ENVIRONMENT}
+    environment:
+      - EMAIL_ID=${EMAIL_ID}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - CLOUD_NAMED=${CLOUD_NAMED}
+      - CLOUD_API_KEY=${CLOUD_API_KEY}
+      - CLOUD_API_SECRETE=${CLOUD_API_SECRETE}
+      - SESSION_SECRET =${SESSION_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY}
+      - CLIENT_URL=${CLIENT_URL}
+    env_file:
+      - .env
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db
+  mongo-express:
+    image: mongo-express
+    restart: always # fixes MongoNetworkError when mongodb is not ready when mongo-express starts
+    ports:
+      - 8080:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+volumes:
+  mongo-data:
+    driver: local
