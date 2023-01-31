@@ -11,9 +11,9 @@ const fileUpload = require("express-fileupload");
 const userRouter = require("./router/userRouter.js");
 
 // swagger
-// const YAML = require("yamljs");
-// const swaggerUi = require("swagger-ui-express");
-// const swaggerDocument = YAML.load("./Swagger_API_DOCS/swagger.yaml");
+const YAML = require("yamljs");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = YAML.load("./Swagger_API_DOCS/swagger.yaml");
 
 app.use(
   cors({
@@ -36,7 +36,7 @@ app.use(
 
 // ROUTES
 // swagger
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // rest api
 app.use("/api/auth", authRouter);
