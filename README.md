@@ -2,11 +2,9 @@
 
 Created a web application which is useful for management of Food Donation and collection activities.
 
-
-
-
 |   |   | 
 |---|---|
+|  0 | [__👉 Live link__](https://github.com/MangeshThakre/food-donation-frontend-FSJS)  |
 |  1 | [__👉 FrontEnd source code__](https://github.com/MangeshThakre/food-donation-frontend-FSJS)  |
 |  2 | [__👉 internship Offer Letter__](https://s3.ap-south-1.amazonaws.com/internship.ineuron.ai/letters/ef3b6155-5739-44d6-99c0-c5d7a8361ecf.pdf)  | 
 |  3 | [__👉 Wireframe document__](https://app.uizard.io/prototypes/EwqnPZjw10UyjKLq0n4V/player)  |  
@@ -16,7 +14,7 @@ Created a web application which is useful for management of Food Donation and co
 
 ## 🐋 Docker image
 
-  `docker push mangeshthakre/food-donation-system:1.0.0.RELEASE`
+  `docker pull mangeshthakre/food-donation-system:1.0.0.RELEASE`
 
 
 
