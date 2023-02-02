@@ -10,6 +10,9 @@ Created a web application which is useful for management of Food Donation and co
 |  3 | [__👉 Wireframe document__](https://app.uizard.io/prototypes/EwqnPZjw10UyjKLq0n4V/player)  |  
 |  3 | [__👉 swagger api documentation__](https://food-donation-system.cyclic.app/api-docs/)  |  
 
+use this Admin cradentials for demo.
+email : boboca4190@ekcsoft.com
+password : 56565656
 
 
 ## 🐋 Docker image
