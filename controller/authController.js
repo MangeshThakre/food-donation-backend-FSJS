@@ -36,6 +36,7 @@ const signIn = async (req, res, next) => {
   if (!email || !password) {
     return next(new CustomError("Please fill all fields", 400));
   }
+
   try {
     const user = await userModel.findOne({ email }).select("+password");
     if (!user) {

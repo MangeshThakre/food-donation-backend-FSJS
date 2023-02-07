@@ -10,6 +10,8 @@ const server = app.listen(process.env.PORT, () =>
 
 // serverless not support socket.io install socket.io befor running on server like aws ec2
 // run socket on server
+
+// "socket.io": "^4.5.4",
 // const io = socketIO(server, { cors: { origin: "*" } });
 // const connectedUsers = {};
 // io.on("connection", (socket) => {

@@ -48,9 +48,9 @@ const userSchema = new Schema(
     timestamps: true
   }
 );
-
 //  search index on all field
 userSchema.index({ "$**": "text" });
+
 // challenge 1 - encrypt password - hooks
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -81,7 +81,6 @@ userSchema.methods = {
 
   generateForgotPasswordToken: function () {
     const forgotToken = crypto.randomBytes(20).toString("hex");
-
     //step 1 - save to DB
     this.forgotPasswordToken = crypto
       .createHash("sha256")
