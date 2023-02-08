@@ -14,13 +14,6 @@ use this Admin cradentials for demo.
 email : boboca4190@ekcsoft.com
 password : 56565656
 
-
-## 🐋 Docker image
-
-  `docker pull mangeshthakre/food-donation-system:1.0.0.RELEASE`
-
-
-
 ## 🧑‍💻 Technologies
 
 ### FrontEnd
