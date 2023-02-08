@@ -4,8 +4,7 @@ const authRouter = require("./router/authRouter.js");
 const donationRouter = require("./router/donationRouter.js");
 const notificationRouter = require("./router/norificationRouter.js");
 const errorHandler = require("./meddleware/errorHandler.js");
-// const cookieOptions = require("./utils/cookieOptions");
-
+const path = require("path");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
@@ -19,9 +18,8 @@ const swaggerDocument = YAML.load("./Swagger_API_DOCS/swagger.yaml");
 app.use(
   cors({
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-    origin: ["http://localhost:3000", "https://food-donation-fsjs.vercel.app"],
-    credentials: true,
-    exposedHeaders: ["set-cookie"]
+    origin: [process.env.CLIENT_URL, "http://localhost:3000"],
+    credentials: true
   })
 );
 
@@ -36,17 +34,30 @@ app.use(
 );
 
 // ROUTES
-// swagger
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// rest api
-app.use("/api/auth", authRouter);
-app.use("/api", donationRouter);
-app.use("/api", userRouter);
-app.use("/api", notificationRouter);
-app.use("/", (req, res) =>
-  res.status(200).json({ success: true, server: "food donation Backend" })
-);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "view/build")));
+  // swagger
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  // rest api
+  app.use("/api/auth", authRouter);
+  app.use("/api", donationRouter);
+  app.use("/api", userRouter);
+  app.use("/api", notificationRouter);
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "view", "build", "index.html"));
+  });
+} else {
+  // swagger
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  // rest api
+  app.use("/api/auth", authRouter);
+  app.use("/api", donationRouter);
+  app.use("/api", userRouter);
+  app.use("/api", notificationRouter);
+  app.use("/", (req, res) =>
+    res.status(200).json({ success: true, server: "food donation Backend" })
+  );
+}
 // ROUTES //
 
 // error handler
